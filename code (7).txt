@@ -1,0 +1,169 @@
+        import React, {
+            useState,
+            useEffect,
+            useRef
+        } from 'react';
+        import {
+            View,
+            TextInput,
+            StyleSheet,
+            FlatList,
+            TouchableOpacity,
+            Text,
+            Keyboard
+        } from 'react-native';
+        import {
+            useTheme
+        } from '../styles/theme'; // Import the useTheme hook
+        import {
+            fetchPlaceSuggestions
+        } from '../utils/api';
+
+        const SearchBar = ({
+            onSearch,
+            onSuggestionPress
+        }) => {
+            const {
+                theme
+            } = useTheme(); // Access the theme
+            const [searchText, setSearchText] = useState('');
+            const [suggestions, setSuggestions] = useState([]);
+            const inputRef = useRef(null); // Ref for the TextInput
+
+            useEffect(() => {
+                // Simulate fetching suggestions from an API (Debounced)
+                const delayDebounceFn = setTimeout(async () => {
+                    if (searchText) {
+                        try {
+                            const suggestions = await fetchPlaceSuggestions(searchText);
+                            setSuggestions(suggestions);
+                        } catch (error) {
+                            console.error("Error fetching suggestions:", error);
+                            // Handle error appropriately
+                        }
+                    } else {
+                        setSuggestions([]);
+                    }
+                }, 500);
+
+                return () => clearTimeout(delayDebounceFn); // Cleanup the timeout
+            }, [searchText]);
+
+            const handleSearchTextChange = (text) => {
+                setSearchText(text);
+            };
+
+            const clearInput = () => {
+                setSearchText('');
+                setSuggestions([]);
+                Keyboard.dismiss();
+                if (inputRef.current) {
+                    inputRef.current.focus(); // Focus on the input after clearing
+                }
+            };
+
+            return ( <
+                View style = {
+                    [styles.container, {
+                        backgroundColor: theme.cardBackground
+                    }]
+                } >
+                <
+                TextInput ref = {
+                    inputRef
+                } // Attach the ref to the TextInput
+                style = {
+                    [styles.input, {
+                        color: theme.text,
+                        borderColor: theme.inputBorder
+                    }]
+                }
+                placeholder = "Search for places"
+                placeholderTextColor = {
+                    theme.text
+                }
+                value = {
+                    searchText
+                }
+                onChangeText = {
+                    handleSearchTextChange
+                }
+                onSubmitEditing = {
+                    () => {
+                        onSearch(searchText);
+                        Keyboard.dismiss();
+                    }
+                }
+                clearButtonMode = "while-editing"
+                accessibilityLabel = "Search"
+                accessibilityHint = "Enter a place name to search for locations" /
+                >
+                <
+                FlatList data = {
+                    suggestions
+                }
+                keyExtractor = {
+                    (item) => item.place_id
+                }
+                renderItem = {
+                    ({
+                        item
+                    }) => ( <
+                        TouchableOpacity style = {
+                            [styles.suggestion, {
+                                borderBottomColor: theme.inputBorder
+                            }]
+                        }
+                        onPress = {
+                            () => {
+                                onSuggestionPress(item);
+                                clearInput();
+                            }
+                        }
+                        accessible = {
+                            true
+                        }
+                        accessibilityLabel = {
+                            `Suggestion: ${item.description}`
+                        }
+                        accessibilityHint = "Double tap to select this suggestion" >
+                        <
+                        Text style = {
+                            {
+                                color: theme.text
+                            }
+                        } > {
+                            item.description
+                        } < /Text> <
+                        /TouchableOpacity>
+                    )
+                }
+                keyboardShouldPersistTaps = "handled" /
+                >
+                <
+                /View>
+            );
+        };
+
+        const styles = StyleSheet.create({
+            container: {
+                padding: 10,
+                backgroundColor: '#fff',
+            },
+            input: {
+                height: 40,
+                borderColor: 'gray',
+                borderWidth: 1,
+                paddingLeft: 10,
+                borderRadius: 5,
+                marginBottom: 5,
+                fontSize: 16,
+            },
+            suggestion: {
+                padding: 10,
+                borderBottomWidth: 1,
+                borderBottomColor: '#eee',
+            },
+        });
+
+        export default SearchBar;
