@@ -1,0 +1,83 @@
+import React, {
+    useState,
+    useEffect,
+    createContext,
+    useContext
+} from 'react';
+import {
+    NavigationContainer
+} from '@react-navigation/native';
+import AppNavigator from './navigation/AppNavigator';
+import {
+    ThemeProvider,
+    useTheme
+} from './styles/theme';
+import LoadingIndicator from './components/LoadingIndicator';
+import ErrorMessage from './components/ErrorMessage';
+
+// Create ThemeContext
+const ThemeContext = createContext({
+    themeMode: 'light',
+    toggleTheme: () => {}
+});
+
+// Custom hook to access the theme
+export const useAppTheme = () => useContext(ThemeContext);
+
+const App = () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [themeMode, setThemeMode] = useState('light'); // Default theme
+
+    useEffect(() => {
+        // Simulate initial loading (fetching data, etc.)
+        const loadData = async () => {
+            try {
+                // You can simulate an API call or any loading process here
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate 2 seconds loading
+            } catch (err) {
+                setError(err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
+    }, []);
+
+    const toggleTheme = () => {
+        setThemeMode(themeMode === 'light' ? 'dark' : 'light');
+    };
+
+    if (isLoading) {
+        return < LoadingIndicator / > ;
+    }
+
+    if (error) {
+        return < ErrorMessage message = {
+            error.message
+        }
+        onRetry = {
+            () => setIsLoading(true)
+        }
+        />;
+    }
+
+    return ( <
+        ThemeProvider themeMode = {
+            themeMode
+        }
+        toggleTheme = {
+            toggleTheme
+        } >
+        <
+        NavigationContainer >
+        <
+        AppNavigator / >
+        <
+        /NavigationContainer> <
+        /ThemeProvider>
+    );
+};
+
+export default App;
