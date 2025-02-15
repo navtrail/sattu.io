@@ -1,0 +1,117 @@
+        import React from 'react';
+        import {
+            View,
+            Text,
+            Image,
+            StyleSheet,
+            TouchableOpacity
+        } from 'react-native';
+        import {
+            useTheme
+        } from '../styles/theme'; // Import the useTheme hook
+
+        const PlaceCard = ({
+            place,
+            onPress
+        }) => {
+            const {
+                theme
+            } = useTheme(); // Access the theme
+
+            return ( <
+                TouchableOpacity style = {
+                    [styles.card, {
+                        backgroundColor: theme.cardBackground
+                    }]
+                }
+                onPress = {
+                    onPress
+                }
+                accessible = {
+                    true
+                }
+                accessibilityLabel = {
+                    `Place: ${place.name}`
+                }
+                accessibilityHint = "Double tap to view details" >
+                <
+                Image style = {
+                    styles.image
+                }
+                source = {
+                    {
+                        uri: place.photos ? place.photos[0].photo_reference : 'https://via.placeholder.com/150'
+                    }
+                }
+                accessible = {
+                    true
+                }
+                accessibilityLabel = "Place Image" /
+                >
+                <
+                View style = {
+                    styles.details
+                } >
+                <
+                Text style = {
+                    [styles.name, {
+                        color: theme.text
+                    }]
+                } > {
+                    place.name
+                } < /Text> <
+                Text style = {
+                    [styles.address, {
+                        color: theme.text
+                    }]
+                } > {
+                    place.vicinity
+                } < /Text> <
+                Text style = {
+                    [styles.rating, {
+                        color: theme.text
+                    }]
+                } > Rating: {
+                    place.rating
+                } < /Text> <
+                /View> <
+                /TouchableOpacity>
+            );
+        };
+
+        const styles = StyleSheet.create({
+            card: {
+                backgroundColor: '#fff',
+                borderRadius: 8,
+                overflow: 'hidden',
+                margin: 10,
+                elevation: 3, // Shadow for Android
+                shadowColor: '#000', // Shadow properties for iOS
+                shadowOffset: {
+                    width: 0,
+                    height: 2
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+            },
+            image: {
+                height: 150,
+                width: '100%',
+            },
+            details: {
+                padding: 10,
+            },
+            name: {
+                fontSize: 18,
+                fontWeight: 'bold',
+            },
+            address: {
+                fontSize: 14,
+                color: 'gray',
+            },
+            rating: {
+                fontSize: 14,
+            },
+        });
+
+        export default PlaceCard;
