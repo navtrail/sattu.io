@@ -1,0 +1,66 @@
+import React from 'react';
+import {
+    createStackNavigator
+} from '@react-navigation/stack';
+import MapScreen from '../screens/MapScreen';
+import PlaceDetailsScreen from '../screens/PlaceDetailsScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import {
+    useTheme
+} from '../styles/theme'; // Import the useTheme hook
+
+const Stack = createStackNavigator();
+
+const AppNavigator = () => {
+    const {
+        theme
+    } = useTheme(); // Access the theme
+    return ( <
+        Stack.Navigator initialRouteName = "Map"
+        screenOptions = {
+            {
+                headerStyle: {
+                    backgroundColor: theme.primary,
+                },
+                headerTintColor: theme.text,
+                headerTitleStyle: {
+                    fontWeight: 'bold',
+                },
+            }
+        } >
+        <
+        Stack.Screen name = "Map"
+        component = {
+            MapScreen
+        }
+        options = {
+            {
+                title: 'Map'
+            }
+        }
+        /> <
+        Stack.Screen name = "PlaceDetails"
+        component = {
+            PlaceDetailsScreen
+        }
+        options = {
+            {
+                title: 'Place Details'
+            }
+        }
+        /> <
+        Stack.Screen name = "Profile"
+        component = {
+            ProfileScreen
+        }
+        options = {
+            {
+                title: 'Profile'
+            }
+        }
+        /> <
+        /Stack.Navigator>
+    );
+};
+
+export default AppNavigator;
