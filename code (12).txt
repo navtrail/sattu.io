@@ -1,0 +1,176 @@
+        import React, {
+            useState
+        } from 'react';
+        import {
+            View,
+            Text,
+            StyleSheet,
+            TextInput,
+            Button,
+            Alert
+        } from 'react-native';
+        import ProfileHeader from '../components/ProfileHeader';
+        import {
+            useTheme
+        } from '../styles/theme'; // Import the useTheme hook
+
+        const ProfileScreen = () => {
+            const {
+                theme
+            } = useTheme(); // Access the theme
+
+            const [user, setUser] = useState({
+                name: 'John Doe',
+                avatar: 'https://via.placeholder.com/150',
+                bio: 'Travel enthusiast and explorer',
+            });
+
+            const [isEditing, setIsEditing] = useState(false);
+            const [editedName, setEditedName] = useState(user.name);
+            const [editedBio, setEditedBio] = useState(user.bio);
+
+            const handleEdit = () => {
+                setIsEditing(true);
+            };
+
+            const handleSave = () => {
+                setUser({
+                    ...user,
+                    name: editedName,
+                    bio: editedBio
+                });
+                setIsEditing(false);
+                Alert.alert('Success', 'Profile updated successfully!');
+            };
+
+            return ( <
+                View style = {
+                    [styles.container, {
+                        backgroundColor: theme.background
+                    }]
+                }
+                accessible = {
+                    true
+                }
+                accessibilityLabel = "Profile Screen"
+                accessibilityHint = "Allows viewing and editing user profile information" >
+                <
+                ProfileHeader user = {
+                    user
+                }
+                /> <
+                View style = {
+                    [styles.details, {
+                        backgroundColor: theme.cardBackground
+                    }]
+                } > {
+                    isEditing ? ( <
+                        View accessible = {
+                            true
+                        }
+                        accessibilityLabel = "Edit Profile Section" >
+                        <
+                        Text style = {
+                            [styles.label, {
+                                color: theme.text
+                            }]
+                        } > Name: < /Text> <
+                        TextInput style = {
+                            [styles.input, {
+                                color: theme.text,
+                                borderColor: theme.inputBorder
+                            }]
+                        }
+                        value = {
+                            editedName
+                        }
+                        onChangeText = {
+                            setEditedName
+                        }
+                        accessible = {
+                            true
+                        }
+                        accessibilityLabel = "Name Input"
+                        accessibilityHint = "Allows editing of the user's name" /
+                        >
+                        <
+                        Text style = {
+                            [styles.label, {
+                                color: theme.text
+                            }]
+                        } > Bio: < /Text> <
+                        TextInput style = {
+                            [styles.input, {
+                                color: theme.text,
+                                borderColor: theme.inputBorder
+                            }]
+                        }
+                        value = {
+                            editedBio
+                        }
+                        onChangeText = {
+                            setEditedBio
+                        }
+                        multiline accessible = {
+                            true
+                        }
+                        accessibilityLabel = "Bio Input"
+                        accessibilityHint = "Allows editing of the user's bio" /
+                        >
+                        <
+                        Button title = "Save"
+                        onPress = {
+                            handleSave
+                        }
+                        color = {
+                            theme.primary
+                        }
+                        accessible = {
+                            true
+                        }
+                        accessibilityLabel = "Save Changes"
+                        accessibilityHint = "Saves the changes made to the profile" /
+                        >
+                        <
+                        /View>
+                    ) : ( <
+                        View accessible = {
+                            true
+                        }
+                        accessibilityLabel = "View Profile Section" >
+                        <
+                        Text style = {
+                            [styles.heading, {
+                                color: theme.text
+                            }]
+                        } > Travel History < /Text> <
+                        Text style = {
+                            [styles.text, {
+                                color: theme.text
+                            }]
+                        } > No recent trips < /Text> <
+                        Button title = "Edit Profile"
+                        onPress = {
+                            handleEdit
+                        }
+                        color = {
+                            theme.primary
+                        }
+                        accessible = {
+                            true
+                        }
+                        accessibilityLabel = "Edit Profile"
+                        accessibilityHint = "Allows the user to edit their profile information" /
+                        >
+                        <
+                        /View>
+                    )
+                } <
+                /View> <
+                /View>
+            );
+        };
+
+        const styles = StyleSheet.create({
+            container: {
+                flex:
