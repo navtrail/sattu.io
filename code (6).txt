@@ -1,0 +1,203 @@
+    import React, {
+        useState,
+        useEffect,
+        useRef
+    } from 'react';
+    import MapView, {
+        Marker,
+        Callout
+    } from 'react-native-maps';
+    import {
+        StyleSheet,
+        View,
+        Alert,
+        Text
+    } from 'react-native';
+    import * as Location from 'expo-location';
+    import {
+        useTheme
+    } from '../styles/theme'; // Import the useTheme hook
+    import {
+        fetchNearbyPlaces
+    } from '../utils/api';
+
+    const MapViewComponent = ({
+            onMarkerPress
+        }) => {
+            const {
+                theme
+            } = useTheme(); // Access the theme
+            const [userLocation, setUserLocation] = useState(null);
+            const [errorMsg, setErrorMsg] = useState(null);
+            const [nearbyPlaces, setNearbyPlaces] = useState([]);
+            const mapRef = useRef(null); // Ref to the MapView
+
+            useEffect(() => {
+                (async () => {
+                    let {
+                        status
+                    } = await Location.requestForegroundPermissionsAsync();
+                    if (status !== 'granted') {
+                        setErrorMsg('Permission to access location was denied');
+                        return;
+                    }
+
+                    try {
+                        let location = await Location.getCurrentPositionAsync({});
+                        setUserLocation(location.coords);
+                        // Fetch nearby places when the user's location is available
+                        fetchNearby(location.coords);
+                    } catch (err) {
+                        setErrorMsg('Unable to get current location.');
+                    }
+                })();
+            }, []);
+
+            useEffect(() => {
+                if (errorMsg) {
+                    Alert.alert('Location Error', errorMsg);
+                }
+            }, [errorMsg]);
+
+            const fetchNearby = async (coords) => {
+                try {
+                    const places = await fetchNearbyPlaces(coords.latitude, coords.longitude);
+                    setNearbyPlaces(places);
+                } catch (error) {
+                    console.error("Error fetching nearby places:", error);
+                    Alert.alert('Error', 'Failed to fetch nearby places.');
+                }
+            };
+
+            // Use useEffect to trigger map zoom after the component is mounted and userLocation is available
+            useEffect(() => {
+                if (userLocation && mapRef.current) {
+                    mapRef.current.animateToRegion({
+                        latitude: userLocation.latitude,
+                        longitude: userLocation.longitude,
+                        latitudeDelta: 0.02, // You can adjust these values to fit more locations
+                        longitudeDelta: 0.02,
+                    }, 2000); // The zoom animation will take 2 seconds
+                }
+            }, [userLocation]);
+
+            let initialRegion = null;
+            if (userLocation) {
+                initialRegion = {
+                    latitude: userLocation.latitude,
+                    longitude: userLocation.longitude,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                };
+            } else {
+                initialRegion = {
+                    latitude: 37.78825,
+                    longitude: -122.4324,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                };
+            }
+
+            return ( <
+                View style = {
+                    styles.container
+                } >
+                <
+                MapView ref = {
+                    mapRef
+                }
+                style = {
+                    styles.map
+                }
+                initialRegion = {
+                    initialRegion
+                }
+                showsUserLocation = {
+                    true
+                }
+                accessible = {
+                    true
+                }
+                accessibilityLabel = "Map of nearby locations"
+                accessibilityHint = "Displays markers for nearby places and user's current location" > {
+                    nearbyPlaces.map((location) => ( <
+                        Marker key = {
+                            location.place_id
+                        }
+                        coordinate = {
+                            {
+                                latitude: location.geometry.location.lat,
+                                longitude: location.geometry.location.lng
+                            }
+                        }
+                        title = {
+                            location.name
+                        }
+                        description = {
+                            location.vicinity
+                        }
+                        pinColor = {
+                            theme.primary
+                        } // Use theme color for pin
+                        onPress = {
+                            () => onMarkerPress(location)
+                        }
+                        accessible = {
+                            true
+                        }
+                        accessibilityLabel = {
+                            `Marker for ${location.name}`
+                        }
+                        accessibilityHint = {
+                            `Double tap to view details of ${location.name}`
+                        } >
+                        <
+                        Callout tooltip accessible = {
+                            true
+                        }
+                        accessibilityLabel = {
+                            `Callout for ${location.name}`
+                        }
+                        accessibilityHint = {
+                            `Displays additional information about ${location.name}. Double tap to view details.`
+                        } >
+                        <
+                        View style = {
+                            styles.calloutView
+                        } >
+                        <
+                        Text style = {
+                            styles.calloutText
+                        } > {
+                            location.name
+                        } < /Text> <
+                        /View> <
+                        /Callout> <
+                        /Marker>
+                    ))
+                } <
+                /MapView> <
+                /View>
+            );
+        };
+
+        const styles = StyleSheet.create({
+            container: {
+                flex: 1,
+            },
+            map: {
+                width: '100%',
+                height: '100%',
+            },
+            calloutView: {
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                borderRadius: 10,
+                padding: 5
+            },
+            calloutText: {
+                fontSize: 16,
+                fontWeight: 'bold'
+            }
+        });
+
+        export default MapViewComponent;
