@@ -1,0 +1,115 @@
+        import React from 'react';
+        import {
+            View,
+            Text,
+            Image,
+            StyleSheet,
+            ScrollView
+        } from 'react-native';
+        import {
+            useRoute
+        } from '@react-navigation/native';
+        import {
+            useTheme
+        } from '../styles/theme'; // Import the useTheme hook
+
+        const PlaceDetailsScreen = () => {
+            const {
+                theme
+            } = useTheme(); // Access the theme
+            const route = useRoute();
+            const {
+                place
+            } = route.params;
+
+            return ( <
+                ScrollView style = {
+                    [styles.container, {
+                        backgroundColor: theme.background
+                    }]
+                } >
+                <
+                Image style = {
+                    styles.image
+                }
+                source = {
+                    {
+                        uri: place.photos ? place.photos[0].photo_reference : 'https://via.placeholder.com/300'
+                    }
+                }
+                accessible = {
+                    true
+                }
+                accessibilityLabel = "Place Image" /
+                >
+                <
+                View style = {
+                    [styles.details, {
+                        backgroundColor: theme.cardBackground
+                    }]
+                } >
+                <
+                Text style = {
+                    [styles.name, {
+                        color: theme.text
+                    }]
+                } > {
+                    place.name
+                } < /Text> <
+                Text style = {
+                    [styles.address, {
+                        color: theme.text
+                    }]
+                } > {
+                    place.vicinity
+                } < /Text> <
+                Text style = {
+                    [styles.rating, {
+                        color: theme.text
+                    }]
+                } > Rating: {
+                    place.rating
+                } < /Text> <
+                Text style = {
+                    [styles.description, {
+                        color: theme.text
+                    }]
+                } > {
+                    place.description || "No description available."
+                } < /Text> <
+                /View> <
+                /ScrollView>
+            );
+        };
+
+        const styles = StyleSheet.create({
+            container: {
+                flex: 1,
+                backgroundColor: '#fff',
+            },
+            image: {
+                width: '100%',
+                height: 200,
+            },
+            details: {
+                padding: 20,
+                borderRadius: 8,
+            },
+            name: {
+                fontSize: 24,
+                fontWeight: 'bold',
+            },
+            address: {
+                fontSize: 16,
+                color: 'gray',
+            },
+            rating: {
+                fontSize: 16,
+            },
+            description: {
+                fontSize: 16,
+                marginTop: 10,
+            },
+        });
+
+        export default PlaceDetailsScreen;
