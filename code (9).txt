@@ -1,0 +1,108 @@
+        import React from 'react';
+        import {
+            View,
+            Text,
+            Image,
+            StyleSheet,
+            TouchableOpacity
+        } from 'react-native';
+        import {
+            useTheme
+        } from '../styles/theme'; // Import the useTheme hook
+        import {
+            useNavigation
+        } from '@react-navigation/native'; // Import useNavigation
+
+        const ProfileHeader = ({
+            user
+        }) => {
+            const {
+                theme
+            } = useTheme(); // Access the theme
+            const navigation = useNavigation();
+
+            return ( <
+                View style = {
+                    [styles.header, {
+                        backgroundColor: theme.primary
+                    }]
+                }
+                accessible = {
+                    true
+                }
+                accessibilityLabel = "Profile Header"
+                accessibilityHint = "Contains profile picture and user info" >
+                <
+                TouchableOpacity onPress = {
+                    () => navigation.navigate('Profile')
+                }
+                accessible = {
+                    true
+                }
+                accessibilityLabel = "View Profile"
+                accessibilityHint = "Navigates to the user profile screen" >
+                <
+                Image style = {
+                    styles.avatar
+                }
+                source = {
+                    {
+                        uri: user.avatar || 'https://via.placeholder.com/100'
+                    }
+                }
+                accessible = {
+                    true
+                }
+                accessibilityLabel = "User Profile Picture" /
+                >
+                <
+                /TouchableOpacity> <
+                View style = {
+                    styles.info
+                } >
+                <
+                Text style = {
+                    [styles.name, {
+                        color: theme.text
+                    }]
+                } > {
+                    user.name
+                } < /Text> <
+                Text style = {
+                    [styles.bio, {
+                        color: theme.text
+                    }]
+                } > {
+                    user.bio || 'No bio provided'
+                } < /Text> <
+                /View> <
+                /View>
+            );
+        };
+
+        const styles = StyleSheet.create({
+            header: {
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: '#6200ee',
+                padding: 20,
+            },
+            avatar: {
+                width: 80,
+                height: 80,
+                borderRadius: 40,
+                marginRight: 20,
+            },
+            info: {
+                flex: 1,
+            },
+            name: {
+                fontSize: 20,
+                fontWeight: 'bold',
+            },
+            bio: {
+                fontSize: 16,
+            },
+        });
+
+        export default ProfileHeader;
